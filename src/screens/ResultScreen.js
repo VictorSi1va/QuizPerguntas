@@ -4,18 +4,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles";
 
 export default function ResultScreen({ route, navigation }) {
+  // Dados recebidos da tela do Quiz
   const { perguntas, respostas, score } = route.params;
-  const total = perguntas.length;
+  const total = perguntas.length; // total de perguntas respondidas
 
+  /**
+   * Renderiza cada pergunta com feedback visual:
+   * - Verde se o usuário acertou
+   * - Vermelho se errou
+   */
   const renderItem = ({ item, index }) => {
-    const respostaUsuario = respostas[index];
-    const acertou = item.correta === respostaUsuario;
+    const respostaUsuario = respostas[index]; // resposta escolhida pelo usuário
+    const acertou = item.correta === respostaUsuario; // verifica se foi correta
 
     return (
       <View
         style={[
           styles.listItem,
           {
+            // Define cor de fundo e borda dependendo do acerto
             backgroundColor: acertou ? "#1e3e1e" : "#3e1e1e",
             borderColor: acertou ? "#00ff99" : "#ff4d6d",
             padding: 14,
@@ -23,15 +30,18 @@ export default function ResultScreen({ route, navigation }) {
           },
         ]}
       >
+        {/* Enunciado da pergunta */}
         <Text style={{ fontSize: 20, color: "#fff", fontWeight: "600", marginBottom: 6 }}>
           {item.texto}
         </Text>
 
+        {/* Resposta escolhida pelo usuário */}
         <Text style={{ fontSize: 18, color: acertou ? "#00ff99" : "#ff4d6d", marginBottom: 4 }}>
           Sua resposta: {respostaUsuario ? item[`alt${respostaUsuario}`] : "Não respondeu"}{" "}
           {acertou ? "✅" : "❌"}
         </Text>
 
+        {/* Caso tenha errado, mostra a resposta correta */}
         {!acertou && (
           <Text style={{ fontSize: 18, color: "#00bfff" }}>
             Resposta correta: {item[`alt${item.correta}`]}
@@ -41,14 +51,16 @@ export default function ResultScreen({ route, navigation }) {
     );
   };
 
+  // Calcula a porcentagem de acertos
   const percScore = ((score / total) * 100).toFixed(0);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#1e1e2e" }}>
-      {/* Cabeçalho e painel de pontuação fixos */}
+      {/* Cabeçalho com título e painel de pontuação */}
       <View style={{ padding: 16 }}>
         <Text style={[styles.title, { fontSize: 36, marginBottom: 16 }]}>Resultado</Text>
 
+        {/* Painel de pontuação com barra de progresso */}
         <View
           style={{
             backgroundColor: "#2e2e3e",
@@ -62,6 +74,8 @@ export default function ResultScreen({ route, navigation }) {
           <Text style={{ fontSize: 32, fontWeight: "bold", color: "#00ff99" }}>
             {score} / {total} ({percScore}%)
           </Text>
+
+          {/* Barra de progresso visual mostrando % de acertos */}
           <View
             style={{
               height: 12,
@@ -74,7 +88,7 @@ export default function ResultScreen({ route, navigation }) {
             <Animated.View
               style={{
                 height: 12,
-                width: `${percScore}%`,
+                width: `${percScore}%`, // largura proporcional ao score
                 backgroundColor: "#6c63ff",
                 borderRadius: 6,
               }}
@@ -83,7 +97,7 @@ export default function ResultScreen({ route, navigation }) {
         </View>
       </View>
 
-      {/* FlatList rolando */}
+      {/* Lista de perguntas com feedback (acertou/errou) */}
       <FlatList
         data={perguntas}
         renderItem={renderItem}
@@ -93,6 +107,7 @@ export default function ResultScreen({ route, navigation }) {
 
       {/* Botões fixos no rodapé */}
       <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+        {/* Jogar novamente → volta para tela de seleção de tema */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("SelecionarTema")}
@@ -100,6 +115,7 @@ export default function ResultScreen({ route, navigation }) {
           <Text style={styles.buttonText}>Jogar Novamente</Text>
         </TouchableOpacity>
 
+        {/* Voltar para Home */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Home")}
